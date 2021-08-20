@@ -5,12 +5,19 @@ import math
 from random import randint
 from random import random
 import argparse
+import os
 
 
 genders=['Male','Female']
 faceNet=cv2.dnn.readNet("opencv_face_detector_uint8.pb","opencv_face_detector.pbtxt")
 ageNet=cv2.dnn.readNet("age.caffemodel","age.prototxt")
 genderNet=cv2.dnn.readNet("gender.caffemodel","gender.prototxt")
+
+parser = argparse.ArgumentParser(description='Generate random identity')
+parser.add_argument('-m', help='male identity', action="store_true")
+parser.add_argument('-f', help='female identity', action='store_true')
+parser.add_argument('-i', help='additional information, e.g. website', default='')
+args = parser.parse_args()
 
 
 def find_face():
@@ -30,7 +37,6 @@ def find_face():
 			y1, y2 = int(detections[0,0,i,4]*height), int(detections[0,0,i,6]*height)
 			return frame, [x1,y1,x2,y2]
 	find_face()
-	
 
 		
 def get_age_sex():
@@ -45,6 +51,7 @@ def get_age_sex():
 	ageNet.setInput(blob)
 	
 	return ageNet.forward()[0].argmax(), genders[genderNet.forward()[0].argmax()]
+
 
 def randomize_age(bracket):
 	if bracket == 0:
@@ -66,6 +73,7 @@ def randomize_age(bracket):
 	else:
 		return randint(20, 40)
 
+	
 def get_name(gender):
 	firstname = "John"
 	lastname = "Doe"
@@ -80,10 +88,22 @@ def get_name(gender):
 		names = fh.readlines()
 	index = math.floor(abs(random() - random()) * (1 + len(names)))
 	lastname = names[index].rstrip()
+	return firstname.title(), lastname.title()
+
+
+def start():
+	agebracket, gender = get_age_sex()
 	
-	return firstname, lastname
-
-agebracket, gender = get_age_sex()
-age = randomize_age(agebracket)
-firstname, lastname = get_name(gender)
-
+	if (args.m and gender == 'Female') or (args.f and gender == 'Male'):
+		start()
+	else:
+		age = randomize_age(agebracket)
+		firstname, lastname = get_name(gender)
+		if args.i != '':
+			os.rename('temp.jpg', "identities/" + args.i + "_" + firstname + " " + lastname + ", " + str(age) + ".jpg")
+		else:
+			os.rename('temp.jpg', "identities/" + firstname + " " + lastname + ", " + str(age) + ".jpg")
+		print("Created " + firstname + " " + lastname + ", " + str(age) + " years old")
+	
+	
+start()
