@@ -3,6 +3,7 @@ from PIL import Image
 import cv2
 import math
 from random import randint
+from random import random
 import argparse
 
 
@@ -64,7 +65,25 @@ def randomize_age(bracket):
 		return randint(60, 100)
 	else:
 		return randint(20, 40)
-	
 
-age, gender = get_age_sex()
-print(str(randomize_age(age)) + " years, " + gender)
+def get_name(gender):
+	firstname = "John"
+	lastname = "Doe"
+	names = []
+	
+	with open(gender + "_names.txt") as fh:
+		names = fh.readlines()
+	index = math.floor(abs(random() - random()) * (1 + len(names)))
+	firstname = names[index].rstrip()
+	
+	with open("lastnames.txt") as fh:
+		names = fh.readlines()
+	index = math.floor(abs(random() - random()) * (1 + len(names)))
+	lastname = names[index].rstrip()
+	
+	return firstname, lastname
+
+agebracket, gender = get_age_sex()
+age = randomize_age(agebracket)
+firstname, lastname = get_name(gender)
+
