@@ -1,5 +1,4 @@
 import requests
-from PIL import Image
 import cv2
 import math
 from random import randint
