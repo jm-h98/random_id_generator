@@ -16,7 +16,7 @@ genderNet=cv2.dnn.readNet("gender.caffemodel","gender.prototxt")
 parser = argparse.ArgumentParser(description='Generate random identity')
 parser.add_argument('-m', help='male identity', action="store_true")
 parser.add_argument('-f', help='female identity', action='store_true')
-parser.add_argument('-i', help='additional information, e.g. website', default='')
+parser.add_argument('-i', type=str, help='additional information, e.g. website', default='')
 args = parser.parse_args()
 
 
